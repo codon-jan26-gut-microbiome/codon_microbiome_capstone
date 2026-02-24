@@ -43,11 +43,11 @@ cdata <- curatedMetagenomicData::curatedMetagenomicData(
   counts = FALSE )              #Large list (7.3 MB)
 
 cdata <- cdata[[1]]
-taxa_data <- assay(cdata)
+taxa_data_all <- assay(cdata)
 rm(cdata)
 
-dim(taxa_data)                  # 618 rows 785 cols
-taxa_data[1:5 , 1:5]            # rownames = taxanomy  , colnames = gid_wgs ID
+dim(taxa_data_all)                  # 618 rows 785 cols
+taxa_data_all[1:5 , 1:5]            # rownames = taxanomy  , colnames = gid_wgs ID
 
 ### Checking for overlap between taxa_data & metadata_filt ----
 ggvenn::ggvenn(
@@ -70,7 +70,8 @@ taxa_data <- taxa_data[ , keep_ids]
 ranks <- c("Kingdom", "Phylum", "Class", "Order",
            "Family", "Genus", "Species", "Strain")
 
-taxa_data_byspecies <- taxa_data %>%
+# keep only species level data for ALL samples
+species_data_all <- taxa_data_all %>%
   as.data.frame() %>%
   rownames_to_column("Org") %>%
   separate(
@@ -88,30 +89,44 @@ taxa_data_byspecies <- taxa_data %>%
   column_to_rownames("Species") %>%
   as.matrix()
 
-dim(taxa_data_byspecies)
-dim(taxa_data)
-rm(taxa_data)
+dim(species_data_all)
+dim(taxa_data_all)
+rm(taxa_data_all)
+
+### Checking for overlap between species_data_all & metadata_filt ----
+ggvenn::ggvenn(
+  list(
+    metadata_filt = rownames(metadata_filt),
+    species_data_all   = colnames(species_data_all)
+  )
+)
+ggsave("results/1c_samples_venn_diagram.png", width = 6, height = 4, dpi = 600)
+
+#--#--#---#--#--#--#--#--#--#--#--#--#
+keep_ids <- intersect(colnames(species_data_all) , rownames(metadata_filt))
+length(keep_ids)                # 785 samples ->  147 samples (gid_wgs)
+
+metadata_filt <- metadata_filt[keep_ids , ]
+taxa_data <- species_data_all[ , keep_ids] # get first year subset of taxa data, retain full version for Q6
+# if u want to check go and check the venn diagram
 
 ### Checking if both taxa_data and metadata_filt are identical ----
-identical(rownames(metadata_filt) , colnames(taxa_data_byspecies))    # TRUE
+identical(rownames(metadata_filt) , colnames(taxa_data))    # TRUE
 rm(keep_ids)
 
 ## Q1D Part 1 ----
 ###Filter low abundance taxa (threshold = 0.01% ----
 
-taxa_data_byspecies[ taxa_data_byspecies < 0.01 ] <- 0  #logical indexing # [] used for subsetting
+taxa_data[ taxa_data < 0.01 ] <- 0  #logical indexing # [] used for subsetting
 
 ## Q1D Part 2 ----
 ### How many species remain? (335)----
 
-keep_species <- which( rowSums(taxa_data_byspecies) > 0 )
-taxa_data_byspecies <- taxa_data_byspecies[ keep_species, ]    # all rows with net 0 removed
+keep_species <- which( rowSums(taxa_data) > 0 )
+taxa_data <- taxa_data[ keep_species, ]    # all rows with net 0 removed
 
-dim(taxa_data_byspecies)                      # (335rows 147 cols) , 618 rows dropped to 335 (species)
+dim(taxa_data)                          # (335rows 147 cols) , 618 rows dropped to 335 (species)
 rm(keep_species)
-
-taxa_data <- taxa_data_byspecies              #long name shortened back because dont really need to specify after this qn
-rm(taxa_data_byspecies)
 
 ##Q1E ----
 ### Apply total sum scaling (TSS) normalization ----
