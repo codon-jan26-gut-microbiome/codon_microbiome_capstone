@@ -647,9 +647,9 @@ plot_maaslin_diff_abundance <- function(maaslin_results,
 
   # ---- raw abundance plot ----
   p_raw <- ggplot(taxa_long,
-                  aes_string(x = group_var,
-                             y = "abundance",
-                             fill = group_var)) +
+                  aes(x = get(group_var),
+                             y = get("abundance"),
+                             fill = get(group_var))) +
     geom_boxplot() +
     geom_jitter(width = 0.2,
                 alpha = 1,
@@ -664,7 +664,7 @@ plot_maaslin_diff_abundance <- function(maaslin_results,
          y = "Relative abundance")
 
   # ---- log plot ----
-  p_log <- ggplot(taxa_long, aes_string(x = group_var, y = "abundance", fill = group_var)) +
+  p_log <- ggplot(taxa_long, aes(x = get(group_var), y = get("abundance"), fill = get(group_var))) +
     geom_boxplot() +
     geom_jitter(width = 0.2, alpha = 1, size = 1) +
     facet_wrap(~taxa, scales = "free_y") +
