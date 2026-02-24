@@ -1,9 +1,13 @@
 # Setting up and loading data ----
-library(tidyverse)
-library(janitor)
+library(ccrepe)
 library(ggpubr)
-library(vegan)
+library(janitor)
 library(Maaslin2)
+library(MMUPHin)
+library(rstatix)
+library(scales)
+library(tidyverse)
+library(vegan)
 
 load("Data/DIABIMMUNE_Karelia_metadata_sub.RData", verbose = TRUE)
 #Q1 ----
@@ -118,8 +122,6 @@ ggplot(metadata_filt , aes(x = country , fill = allergy_milk)) +
   scale_y_continuous(labels = scales::percent)
 
 ##better looking version of 2A. ----
-library(tidyverse)
-library(scales)
 
 ggplot(metadata_filt %>% tibble::as_tibble(),
        aes(x = country, fill = factor(allergy_milk))) +
@@ -153,8 +155,6 @@ ggplot(metadata_covariates, aes(x = country, y = age_at_collection, fill = count
 ggplot(metadata_covariates , aes(x = country  , fill = delivery)) + 
   geom_bar( ) + labs( x = "country" , y = " type of delivery ")
 ##better version for delivery distribution ----
-library(tidyverse)
-
 ggplot(metadata_covariates %>% tibble::as_tibble(),
        aes(x = country, fill = delivery)) +
   geom_bar(position = position_dodge(width = 0.8),
@@ -183,7 +183,6 @@ ggplot(metadata_covariates , aes(x = country  , fill = Exclusive_breast_feeding)
   geom_bar( ) + labs( x = "country" , y = "Breastfed children") # this is the simpler version of the chart 
 
 ##better version for breast feeding distribution ----
-library(tidyverse)
 df_bf <- metadata_covariates %>%
   tibble::as_tibble() %>%
   mutate(Exclusive_breast_feeding = as.logical(Exclusive_breast_feeding)) %>%
@@ -213,13 +212,8 @@ alpha_diversity_plot <- function(metadata,
                                  group_var,
                                  facet_ncol = 3,
                                  add_stats = TRUE) {
-  # packages
-  require(dplyr)
-  require(tidyr)
-  require(ggplot2)
-  require(vegan)
-  require(rstatix)
-  
+
+
   # ---- calculate alpha diversity ----
   metadata_out <- metadata %>%
     mutate(
@@ -290,11 +284,8 @@ beta_diversity_pcoa <- function(metadata,
                                 binary = TRUE,
                                 k = 2,
                                 ellipse = TRUE) {
-  # packages
-  require(vegan)
-  require(ggplot2)
-  require(dplyr)
-  
+
+
   method <- match.arg(method)
   
   # ---- confirm sample name matches ----
@@ -429,12 +420,8 @@ top_species_barplot <- function(metadata,
                                 taxa_data,
                                 group_var,
                                 top_n = 15){
-  
-  require(dplyr)
-  require(ggplot2)
-  require(tibble)
-  require(forcats)
-  
+
+
   # ---- sanity check sample matching ----
   stopifnot(
     identical(rownames(metadata),
@@ -514,10 +501,7 @@ run_maaslin_country <- function(metadata,
                                 prevalence = 0.10,
                                 abundance = 0.001,
                                 q_cutoff = 0.01){
-  
-  require(Maaslin2)
-  require(dplyr)
-  
+
   # ---- sanity check ----
   stopifnot(
     identical(rownames(metadata),
@@ -599,13 +583,8 @@ plot_maaslin_diff_abundance <- function(maaslin_results,
                                         group_var = "country",
                                         q_cutoff = 0.01,
                                         pseudocount = 1e-6){
-  
-  require(dplyr)
-  require(tidyr)
-  require(tibble)
-  require(ggplot2)
-  require(ggpubr)
-  
+
+
   # ---- sanity check ----
   stopifnot(
     identical(rownames(metadata),
@@ -695,9 +674,6 @@ rm(res_maas, vis_maas)
 # 5a ----------------------------------------------------------------------
 #### 5. Functional Pathway Analysis
 ### a. Subset the pathway relative abundance profiles to correspond with your filtered samples (similar to what you did for species profiles)
-
-library(ccrepe)
-library(MMUPHin)
 
 # Load VatanenT_2016 metabolic pathway abundance
 capstone_pathway_data <- curatedMetagenomicData(
