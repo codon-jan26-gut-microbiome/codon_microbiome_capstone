@@ -1,11 +1,9 @@
 # Setting up and loading data ----
-setwd("C:/previous desktop folders/Desktop/CAPSTONE PROJECT")
 library(tidyverse)
 library(janitor)
 library(ggpubr)
 library(vegan)
 library(Maaslin2)
-rm(list = ls())
 
 load("Data/DIABIMMUNE_Karelia_metadata_sub.RData", verbose = TRUE)
 #Q1 ----
