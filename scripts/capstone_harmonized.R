@@ -1,4 +1,9 @@
-# Setting up and loading data ----
+# Setting up renv (project-local environment) ----
+getRversion() # renv tested with R v4.5.1
+if (require("renv") == FALSE) install.packages("renv")
+renv::restore()
+
+# Loading packages ----
 library(ccrepe)
 library(ggbeeswarm)
 library(ggpubr)
@@ -10,7 +15,9 @@ library(scales)
 library(tidyverse)
 library(vegan)
 
-load("Data/DIABIMMUNE_Karelia_metadata_sub.RData", verbose = TRUE)
+# Loading data ----
+load("data/DIABIMMUNE_Karelia_metadata_sub.RData", verbose = TRUE)
+
 #Q1 ----
 ##Q1A Doing some initial eda on meta data ----
 dim(metadata_all)               # 1946 rows 18 col
@@ -89,7 +96,7 @@ rm(keep_ids)
 ## Q1D Part 1 ----
 ###Filter low abundance taxa (threshold = 0.01% ----
 
-taxa_data_byspecies[ taxa_data_byspecies < 0.01 ] <- 0  #logical indexing # [] usede for subsetting 
+taxa_data_byspecies[ taxa_data_byspecies < 0.01 ] <- 0  #logical indexing # [] used for subsetting
 
 ## Q1D Part 2 ----
 ### How many species remain? (335)----
@@ -109,7 +116,7 @@ col_totals <- colSums(taxa_data)
 taxa_tss_data <- sweep(
   taxa_data[, col_totals > 0, drop = FALSE],
   2,
-  col_totals[col_totals > 0],
+  col_totals[col_totals > 0], # avoid div0 error for samples with no species detected
   "/"
 )
 
@@ -187,8 +194,7 @@ df_bf <- metadata_covariates %>%
   tibble::as_tibble() %>%
   mutate(Exclusive_breast_feeding = as.logical(Exclusive_breast_feeding)) %>%
   dplyr::count(country, Exclusive_breast_feeding, name = "n")
-
-df_bf
+print(df_bf)
 
 ggplot(df_bf, aes(x = country, y = n, color = Exclusive_breast_feeding)) +
   geom_linerange(aes(ymin = 0, ymax = n),
@@ -706,15 +712,13 @@ pathway_tss <- sweep(
   FUN = "/"
 ) * 100
 
-colSums(pathway_tss) # should all be 100
+summary(colSums(pathway_tss)) # should all be 100
 
 metadata_filt_gidwgs <- metadata_filt %>%
   rownames_to_column("gid_wgs")
 
 common_ids_pathway <- intersect(metadata_filt_gidwgs$gid_wgs, colnames(pathway_tss))
-
 length(common_ids_pathway) # 147
-length(metadata_filt_gidwgs$gid_wgs) # 162
 
 # Taking common pathways
 pathway_first_year <- pathway_tss %>%
@@ -723,7 +727,7 @@ pathway_first_year <- pathway_tss %>%
 length(pathway_first_year) # should be 147
 
 # Simplifying pathway names (e.g. KDO-NAGLIPASYN-PWY: superpathway of (Kdo)2-lipid A biosynthesis -> KDO-NAGLIPASYN-PWY)
-# Also keep a Origional copy for future lookup table
+# Also keep an original copy for future lookup table
 ori_pathway_filt <- pathway_first_year
 rownames(pathway_first_year) <- sub(":.*", "", rownames(pathway_first_year))
 
@@ -996,17 +1000,17 @@ ggplot(plot_sig_path,
        aes(x = country, y = abundance, fill = country)) +
   geom_boxplot(outlier.shape = NA, width = 0.6) +
   geom_jitter(width = 0.1, height = 0.0004, size = 0.1, alpha = 0.15) +
-  facet_wrap(~ pathway_label, scales = "free_y") +
+  facet_wrap(~ pathway_label, scales = "free_y", nrow = 2) +
   scale_y_continuous(labels = scales::label_number(suffix = "%")) +
   theme_bw() +
-  theme(legend.position = "none") +
+  theme(legend.position = "none", strip.text = element_text(hjust = 0)) +
   ylab("Pathway abundance (%)")
 
 # Print q val table
 top8_table <- maaslin_results %>%
   select(original_name, qval, coef) %>%
   slice_head(n = 8)
-top8_table
+print(top8_table)
 
 rm(sub_metadata, diff_path, plot_sig_path, top8_table, top8_paths)
 
@@ -1137,7 +1141,8 @@ ggplot(taxa_summary, aes(x = country, y = total_abundance, fill = pathway_specie
   geom_bar(stat = "identity", position = "stack", colour = "darkslategrey") +
   labs(
     x = "Country",
-    y = "Total contribution to NAGLIPASYN-PWY",
+    y = "",
+    title = "Total contribution to NAGLIPASYN-PWY",
     fill = "Species"
   ) +
   theme_bw() +
