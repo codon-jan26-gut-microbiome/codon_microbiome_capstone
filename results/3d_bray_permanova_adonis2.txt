@@ -1,0 +1,17 @@
+Permutation test for adonis under reduced model
+Terms added sequentially (first to last)
+Permutation: free
+Number of permutations: 999
+
+adonis2(formula = dist_mat ~ age_at_collection + gender + delivery + Exclusive_breast_feeding + abx_first_year + country, data = meta, permutations = 999, by = "terms", na.action = na.omit)
+                          Df SumOfSqs      R2      F Pr(>F)    
+age_at_collection          1    1.563 0.02762 4.3133  0.001 ***
+gender                     1    0.338 0.00597 0.9316  0.551    
+delivery                   1    0.533 0.00943 1.4722  0.084 .  
+Exclusive_breast_feeding   1    0.587 0.01038 1.6204  0.053 .  
+abx_first_year             1    0.308 0.00544 0.8488  0.658    
+country                    2    3.253 0.05749 4.4887  0.001 ***
+Residual                 138   50.003 0.88369                  
+Total                    145   56.585 1.00000                  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
