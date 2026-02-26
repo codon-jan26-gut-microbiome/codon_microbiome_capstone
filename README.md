@@ -8,10 +8,22 @@ Capstone project for the CODON+ Genomics Data Science with Microbial Research (J
 - `scripts/capstone_harmonized.R`: **[main script](scripts/capstone_harmonized.R)** for analysis
 - `results`: outputs
 
-## Reproducing this project (`renv`)
-This repository uses the `renv` R package with an R project to maintan a reproducible project-local environment. 
-- The R project ([`codon_microbiome_capstone.Rproj`](./codon_microbiome_capstone.Rproj)) ensures that the working directory is always the root folder of this repository, `codon_microbiome_capstone`, regardless of your local file structure.
-- All packages and versions required for the project have been tested with R v4.5.1 and are specified in [`renv.lock`](./renv.lock). 
+## Reproducing this project 
+### Repository and scripts
+1. Create a local copy of this project (e.g. by using `git clone` on the command line). See [GitHub Docs](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) for detailed instructions.
+2. Follow the steps in [the next section](#project-local-environment-and-dependencies-renv) to set up the project dependencies.
+3. Run the main script for analysis `scripts/capstone_harmonized.R`.
+4. Check the outputs in the `results/` folder.
+
+### Project-local environment and dependencies (`renv`)
+This repository uses the `renv` R package with an R project to maintan a reproducible project-local environment. Check out the `renv` vignette [here](https://cran.r-project.org/web/packages/renv/vignettes/renv.html) for an introduction to the package.
+
+The R project ([`codon_microbiome_capstone.Rproj`](./codon_microbiome_capstone.Rproj)) ensures that the working directory is always the root folder of this repository, `codon_microbiome_capstone`, regardless of your local file structure.
+
+All packages and versions required for the project have been tested with R 4.5.1 and are specified in [`renv.lock`](./renv.lock). If you have a different version of R, you may wish to consider changing this by: 
+1. Download R 4.5.1 from CRAN by clicking [this link](https://cran.r-project.org/bin/windows/base/) >> Previous releases >> R 4.5.1 >> download `R-4.5.1-win.exe`.
+2. Open RStudio, go to Tools >> Global options >> R version. Edit the path to point to R-4.5.1. 
+3. You can check this was successful by running the `getRversion()` function in the RStudio console. This should return '4.5.1'. 
 
 To replicate the exact environment used, 
 1. Install the `renv` R package from CRAN using `install.packages("renv")`.
